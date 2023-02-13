@@ -1,6 +1,8 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
 from datetime import date
+from ResponseModel import *
+
 
 class ProductLineModel(BaseModel):
     productLine: str | None = None
@@ -16,16 +18,23 @@ class DaoProductLines:
         try:
             productlines = []
             query = "SELECT * FROM productlines;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 productlines.append(ProductLineModel(productLine = row[0], 
                                                textDescription=  row[1], 
                                                htmlDescription = row[2],
                                                image = row[3], 
                                                ))
-            return productlines
-        except Exception as e:
-            print(e)
+            return response (
+                message = 'OK',
+                result = productlines
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
+
 
     def add_productline(self, productline):
         try:

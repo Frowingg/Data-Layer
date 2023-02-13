@@ -1,7 +1,6 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
-from fastapi import Response
-from fastapi.responses import JSONResponse, RedirectResponse
+from ResponseModel import *
 
 class OfficeModel(BaseModel):
     officeCode: str | None = None
@@ -22,8 +21,8 @@ class DaoOffices:
         try:
             offices = []
             query = "SELECT * FROM offices;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 offices.append(OfficeModel(officeCode = row[0], 
                                                city=  row[1], 
                                                phone = row[2],
@@ -34,9 +33,16 @@ class DaoOffices:
                                                postalCode = row[7],
                                                territory = row[8]
                                                ))
-            return offices
-        except Exception as e:
-            print(e)
+            return response (
+                message = 'OK',
+                result = offices
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
+
 
     def add_office(self, office):
         try:

@@ -1,5 +1,7 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
+from ResponseModel import *
+
 
 class ProductModel(BaseModel):
     productCode: str | None = None
@@ -20,8 +22,8 @@ class DaoProducts:
         try:
             products = []
             query = "SELECT * FROM products;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 products.append(ProductModel(productCode = row[0], 
                                                productName=  row[1], 
                                                productLine = row[2],
@@ -32,9 +34,15 @@ class DaoProducts:
                                                buyPrice = row[7],
                                                MSRP = row[8]
                                                ))
-            return products
-        except Exception as e:
-            print(e)
+            return response (
+                message = 'OK',
+                result = products
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
 
     def add_product(self, product):
         try:

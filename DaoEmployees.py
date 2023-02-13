@@ -1,5 +1,6 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
+from ResponseModel import *
 
 class EmployeeModel(BaseModel):
     employeeNumber: int | None = None
@@ -19,8 +20,8 @@ class DaoEmployees:
         try:
             employees = []
             query = "SELECT * FROM employees;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 employees.append(EmployeeModel(employeeNumber = row[0], 
                                                lastName = row[1], 
                                                firstName=  row[2], 
@@ -30,10 +31,15 @@ class DaoEmployees:
                                                reportsTo =  row[6], 
                                                jobTitle = row[7]
                                                ))
-            return employees
-        except Exception as e:
-            print(e)
-
+            return response (
+                message = 'OK',
+                result = employees
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
     def add_employee(self, employee):
         try:
             self.db.exe_query(f"INSERT INTO employees (employeeNumber, lastName, firstName, extension, email, officeCode, reportsTo, jobTitle) VALUES ('{employee.employeeNumber}','{employee.lastName}','{employee.firstName}','{employee.extension}','{employee.email}','{employee.officeCode}','{employee.reportsTo}','{employee.jobTitle}');commit")

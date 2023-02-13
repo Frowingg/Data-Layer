@@ -1,6 +1,7 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
 from datetime import date
+from ResponseModel import *
 
 class PaymentModel(BaseModel):
     customerNumber: int  
@@ -16,16 +17,23 @@ class DaoPayments:
         try:
             payments = []
             query = "SELECT * FROM payments;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 payments.append(PaymentModel(customerNumber = row[0], 
                                                checkNumber=  row[1], 
                                                paymentDate = row[2],
                                                amount = row[3], 
                                                ))
-            return payments
-        except Exception as e:
-            print(e)
+            return response (
+                message = 'OK',
+                result = payments
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
+
 
     def add_payment(self, payment):
         try:

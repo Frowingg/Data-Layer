@@ -1,6 +1,7 @@
 from DbHelper import DbHelper
 from pydantic import BaseModel
 from datetime import date
+from ResponseModel import *
 
 class OrderModel(BaseModel):
     orderNumber: int | None = None
@@ -19,8 +20,8 @@ class DaoOrders:
         try:
             orders = []
             query = "SELECT * FROM orders;"
-            result = self.db.exe_query(query)
-            for row in result:
+            rows = self.db.exe_query(query)
+            for row in rows:
                 orders.append(OrderModel(orderNumber = row[0], 
                                         orderDate=  row[1], 
                                         requiredDate = row[2],
@@ -29,9 +30,16 @@ class DaoOrders:
                                         comments = row[5],
                                         customerNumber = row[6]
                                         ))
-            return orders
-        except Exception as e:
-            print(e)
+            return response (
+                message = 'OK',
+                result = orders
+            )
+        except Exception as error:
+            return response (
+                message = 'KO',
+                result = error
+            )
+
 
     def add_order(self, order):
         try:
